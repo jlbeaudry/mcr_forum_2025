@@ -1,0 +1,297 @@
+---
+title: "DVCR Forum with MCRs (July 2025)"
+subtitle: "Summary of Responses to RDS Survey: Complete Report"
+#author: "Jen Beaudry"
+#date: "24/03/2026"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+header-includes:
+  - \usepackage{caption}
+  - \usepackage{titling}
+    \setlength{\droptitle}{-2cm} # removes some of the white space above title
+  - \pretitle{\begin{center}
+    \includegraphics[width=1.5in, height=0.5in]{flinders-university-horizontal-master.png}\LARGE\\} # adds logo
+  - \posttitle{\end{center}}
+  - \usepackage{fancyhdr}
+  - \fancypagestyle{plain}{\pagestyle{fancy}} # sets the footer on page 1
+  - \pagestyle{fancy} # sets the footer on page 2 and beyond
+  - \fancyhf{} # clears existing header & footer
+  - \renewcommand{\headrulewidth}{0pt} # removes the line from the header
+  - \fancyfoot[R]{\thepage} # page number in foooter
+---
+
+```{r setup, include=FALSE}
+
+### NOTE: USE THIS FOR THE FULL REPORT ###
+
+knitr::opts_chunk$set(echo = FALSE,
+                      include = TRUE, 
+                      eval = TRUE)
+
+# REMEMBER: Until you figure out parameterized reports, you'll have to manually 
+  # select which chunks to run and will need to delete the 'empty pages' that 
+  # aren't included in Rob's report
+
+```
+
+```{r library, include=FALSE}
+
+library(here)
+library(tidyverse)
+library(kableExtra)
+library(RColorBrewer)
+
+```
+
+```{r functions, include=FALSE}
+
+styler_pdf <- function(dat) {
+  dat %>%
+     kable_styling(full_width = F, 
+                latex_options = c("striped", "HOLD_position"))
+}
+
+source(here("..", "functions", "ratings_summary.R"))
+
+```
+
+```{r load data, include=FALSE}
+
+df <- read_csv(here::here("data", "mcr_forum_processed.csv"), lazy = FALSE)
+
+# get this data from the spreadsheet
+attendees <- as.integer(39)
+
+```
+
+We asked our attendees five questions. Three were about the forum, one was about
+other training and development offerings that they would like, and one was an open-ended 
+question giving them a chance to tell us anything else they wanted us to know. 
+
+Of the `r attendees` mid-career researchers who attended this session, `r nrow(df)` 
+completed the survey. The responses might not be reflective of the attitudes of 
+all attendees because of the relatively low response rate (`r round((nrow(df)/attendees*100),2)`%).
+
+It's important to keep in mind the context in which this forum was held. This year, 
+the University implemented a university-wide academic workload model, which has 
+had a considerable impact on the academic community. As such, some of the questions 
+in the forum related to having enough time to conduct research and supervise 
+HDR students in the face of increased teaching demands; however, this was less 
+of a focus in the MCR Forum than it was in the ECR Forum. 
+
+\captionsetup[table]{labelformat=empty}
+
+
+## Feedback about today's DVC(R) forum with MCRs
+What did you think about today's forum?
+
+```{r table for feedback}
+
+# use for complete report and report for DVCR
+
+# put relevant data in a tibble
+feedback <- df %>% 
+  dplyr::select(c(id, feedback)) %>% 
+  filter(!feedback == "NA") %>%  # remove the NA values
+  mutate(responses = 1:n()) %>% 
+  relocate(responses, .after = id)
+
+# get the relevant ns for the header
+total_n <- length(unique(df$id))
+resp_n <- length(unique(feedback$id))
+ns <- c(total_n, resp_n) 
+
+feedback <- feedback %>% 
+  dplyr::select(c(id, feedback))
+
+knitr::kable (
+  feedback,
+    format = "latex",
+  escape = F,
+  booktabs = T,
+  linesep = "\\addlinespace",
+  col.names = c("ID", "MCR Forum Feedback"),
+  caption =
+    sprintf("From the %s people responded to this question", paste(ns, collapse = " completed surveys, ")),
+  align = 'cl', 
+  longtable = T #break the table over multiple pages
+  ) %>%
+  column_spec(2, width = "5.5in") %>% 
+  kable_styling(full_width = F, 
+                latex_options = c("repeat_header", "hold_position", "striped")) 
+# use different styling to repeat the header
+
+
+```
+
+
+\captionsetup[table]{labelformat=empty}
+
+## Takeaways from the MCR Forum
+What is one new thing that you learned from today's forum?
+
+```{r table for new_thing}
+
+# use for complete report and report for DVCR
+
+# put relevant data in a tibble
+new_thing <- df %>% 
+  dplyr::select(c(id, new_thing)) %>% 
+  filter(!new_thing == "NA") %>%  # remove the NA values
+  mutate(responses = 1:n()) %>% 
+  relocate(responses, .after = id)
+
+# get the relevant ns for the header
+total_n <- length(unique(df$id))
+resp_n <- length(unique(new_thing$id))
+ns <- c(total_n, resp_n) 
+
+new_thing <- new_thing %>% 
+  dplyr::select(c(id, new_thing))
+
+knitr::kable (
+  new_thing,
+  format = "latex",
+  booktabs = T,
+  linesep = "\\addlinespace",
+  col.names = c("ID", "What's one new thing that you learned?"),
+  caption =
+    sprintf("From the %s people responded to this question", paste(ns, collapse = " completed surveys, ")),
+  align = 'cl', 
+  longtable = T #break the table over multiple pages
+  ) %>%
+  column_spec(2, width = "5.5in") %>% 
+  kable_styling(full_width = F, 
+                latex_options = c("repeat_header", "hold_position", "striped")) 
+# use different styling to repeat the header
+
+
+```
+
+\newpage
+## Ideas for the DVC(R) forum with MCRs
+What would you like to see in future fora with the DVC(R)?
+
+```{r table for forum ideas}
+
+# use for complete report and report for DVCR
+
+# put relevant data in a tibble
+forum_ideas <- df %>% 
+  dplyr::select(c(id, future_fora)) %>% 
+  filter(!future_fora == "NA") %>%  # remove the NA values
+  mutate(responses = 1:n()) %>% 
+  relocate(responses, .after = id)
+
+# get the relevant ns for the header
+total_n <- length(unique(df$id))
+resp_n <- length(unique(forum_ideas$id))
+ns <- c(total_n, resp_n) 
+
+forum_ideas <- forum_ideas %>% 
+  dplyr::select(c(id, future_fora))
+
+knitr::kable (
+  forum_ideas,
+  format = "latex",
+  booktabs = T,
+  linesep = "\\addlinespace",
+  col.names = c("ID", "Ideas for future MCR Fora"),
+  caption =
+    sprintf("From the %s people responded to this question", paste(ns, collapse = " completed surveys, ")),
+  align = 'cl', 
+  longtable = T #break the table over multiple pages
+  ) %>%
+  column_spec(2, width = "5.5in") %>% 
+  kable_styling(full_width = F, 
+                latex_options = c("repeat_header", "hold_position", "striped")) 
+# use different styling to repeat the header
+
+
+```
+
+
+## Ideas for other training and development opportunities
+What other researcher training and development opportunities would you like to see
+at Flinders?
+
+```{r table for other training}
+
+# put relevant data in a tibble
+other_training <- df %>% 
+  dplyr::select(c(id, training)) %>% 
+  filter(!training == "NA") %>%  # remove the NA values
+  mutate(responses = 1:n()) %>% 
+  relocate(responses, .after = id)
+
+# get the relevant ns for the header
+total_n <- length(unique(df$id))
+resp_n <- length(unique(other_training$id))
+ns <- c(total_n, resp_n) 
+
+other_training <- other_training %>% 
+  dplyr::select(c(id, training))
+
+knitr::kable (
+  other_training,
+  format = "latex",
+  booktabs = T,
+  linesep = "\\addlinespace",
+  col.names = c("ID", "Other Training Ideas"),
+  caption =
+    sprintf("From the %s people responded to this question", paste(ns, collapse = " completed surveys, ")),
+  align = 'cl', 
+  longtable = T #break the table over multiple pages
+  ) %>%
+  column_spec(2, width = "5.5in") %>% 
+  kable_styling(full_width = F, 
+                latex_options = c("repeat_header", "hold_position", "striped")) 
+# use different styling to repeat the header
+
+
+```
+
+
+\captionsetup[table]{labelformat=empty}
+
+## Final comments
+Is there anything else you would like us to know?
+
+```{r table for anything else}
+
+# put relevant data in a tibble
+anything <- df %>% 
+  dplyr::select(c(id, anything_else)) %>% 
+  filter(!anything_else == "NA") %>%  # remove the NA values
+  mutate(responses = 1:n()) %>% 
+  relocate(responses, .after = id)
+
+# get the relevant ns for the header
+total_n <- length(unique(df$id))
+resp_n <- length(unique(anything$id))
+ns <- c(total_n, resp_n) 
+
+anything <- anything %>% 
+  dplyr::select(c(id, anything_else))
+
+knitr::kable (
+  anything,
+  format = "latex",
+  booktabs = T,
+  linesep = "\\addlinespace",
+  col.names = c("ID", "Other Ideas"),
+  caption =
+   sprintf("From the %s people responded to this question", paste(ns, collapse = " completed surveys, ")),
+  align = 'cl', 
+  longtable = T #break the table over multiple pages
+  ) %>%
+  column_spec(2, width = "5.5in") %>% 
+  kable_styling(full_width = F, 
+                latex_options = c("repeat_header", "hold_position", "striped")) 
+# use different styling to repeat the header
+
+
+```
+
+If you have any questions, please contact Dr Jen Beaudry, Manager, Researcher Training, Development and Communication in Research Development and Support. 
